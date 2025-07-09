@@ -1,0 +1,97 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+local LP = Players.LocalPlayer
+local GiveMoneyEvent = ReplicatedStorage:WaitForChild("GiveClaimMoney")
+
+-- splash
+local splashGui = Instance.new("ScreenGui", game.CoreGui)
+local splashFrame = Instance.new("Frame", splashGui)
+splashFrame.Size = UDim2.fromScale(1,1)
+splashFrame.BackgroundColor3 = Color3.new(0,0,0)
+
+local big = Instance.new("TextLabel", splashFrame)
+big.Size = UDim2.new(1,0,0,120)
+big.Position = UDim2.new(0,0,0.45,-80)
+big.Text = "MADE  BY  DARKDEX"
+big.Font = Enum.Font.GothamBlack
+big.TextScaled = true
+big.TextColor3 = Color3.fromRGB(255,0,0)
+big.BackgroundTransparency = 1
+big.TextStrokeTransparency = 0.15
+
+local small = big:Clone()
+small.Parent = splashFrame
+small.Size = UDim2.new(1,0,0,60)
+small.Position = UDim2.new(0,0,0.55,0)
+small.Text = "follow darkdex"
+small.TextColor3 = Color3.fromRGB(255,255,255)
+small.TextStrokeTransparency = 0.4
+
+TweenService:Create(big, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, true), {TextColor3 = Color3.fromRGB(255,255,255)}):Play()
+TweenService:Create(small, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, true), {TextTransparency = 0.5}):Play()
+
+-- main gui
+local running = false
+local function createGUI()
+    local gui = Instance.new("ScreenGui", LP.PlayerGui)
+    local frame = Instance.new("Frame", gui)
+    frame.Size = UDim2.new(0,260,0,110)
+    frame.Position = UDim2.new(0.5,-130,0.5,-55)
+    frame.BackgroundColor3 = Color3.fromRGB(25,25,25)
+    frame.Active = true frame.Draggable = true
+    Instance.new("UICorner", frame).CornerRadius = UDim.new(0,8)
+
+    local title = Instance.new("TextLabel", frame)
+    title.Size = UDim2.new(1,0,0,30)
+    title.BackgroundTransparency = 1
+    title.Text = "Darkdex GUI"
+    title.Font = Enum.Font.GothamBold
+    title.TextScaled = true
+    title.TextColor3 = Color3.fromRGB(255,0,0)
+
+    local btn = Instance.new("TextButton", frame)
+    btn.Size = UDim2.new(0.8,0,0,35)
+    btn.Position = UDim2.new(0.1,0,0,40)
+    btn.BackgroundColor3 = Color3.fromRGB(200,0,0)
+    btn.Text = "Inf Money"
+    btn.TextScaled = true
+    btn.TextColor3 = Color3.new(1,1,1)
+    btn.Font = Enum.Font.GothamBold
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0,6)
+
+    local status = Instance.new("TextLabel", frame)
+    status.Size = UDim2.new(1,0,0,20)
+    status.Position = UDim2.new(0,0,0,80)
+    status.BackgroundTransparency = 1
+    status.Font = Enum.Font.Gotham
+    status.TextScaled = true
+    status.TextColor3 = Color3.new(1,1,1)
+
+    local function start()
+        running = true
+        btn.Text = "Stop Money"
+        status.Text = "Inf Money running..."
+        task.spawn(function()
+            while running do
+                GiveMoneyEvent:FireServer(LP)
+                task.wait(0.1)
+            end
+        end)
+    end
+
+    local function stop()
+        running = false
+        btn.Text = "Inf Money"
+        status.Text = "Inf Money stopped"
+    end
+
+    btn.MouseButton1Click:Connect(function()
+        if running then stop() else start() end
+    end)
+end
+
+task.delay(2, function()
+    splashGui:Destroy()
+    createGUI()
+end)
